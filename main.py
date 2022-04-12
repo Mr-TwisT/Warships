@@ -6,18 +6,22 @@ import time
 
 WIDTH = 1000
 HEIGHT = 750
+SIZE = 48
 # 10 frakcji z których będzie losowanie
 FRACTION_LIST = ["Pirates", "Poland", "Sparrows",
                  "Avengers", "United", "Soccers", "Assassins", "Titans", "Students", "Idk"]
 
 
 class Ship(ABC):
-    def __init__(self, surface, name, color, fraction, speed):
+    def __init__(self, surface, name, fraction, speed, endurance, color, x, y):
         self.surface = surface
         self.name = name
-        self.color = color
         self.fraction = fraction
         self.speed = speed
+        self.endurance = endurance
+        self.color = color
+        self.x = x * SIZE
+        self.y = y * SIZE
 
     @abstractmethod
     def typeOfShip(self):
@@ -29,72 +33,81 @@ class Ship(ABC):
 
 
 class AircraftCarrier(Ship):  # Lotniskowiec
-    def __init__(self, surface, name, fraction, speed=1, color="lightblue"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=1, endurance=5, color="lightblue", x=2, y=5):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/lotniskowiec.png")
 
     def typeOfShip(self):
         return "Lotniskowiec"
 
 
 class Battleship(Ship):  # Pancernik
-    def __init__(self, surface, name, fraction, speed=2, color="brown"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=2, endurance=6, color="brown", x=2, y=2):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/pancernik.png")
 
     def typeOfShip(self):
         return "Pancernik"
 
 
 class Cruiser(Ship):  # Krążownik
-    def __init__(self, surface, name, fraction, speed=3, color="green"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=3, endurance=3, color="green", x=6, y=7):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/krazownik.png")
 
     def typeOfShip(self):
         return "Krążownik"
 
 
 class Destroyer(Ship):  # Niszczyciel
-    def __init__(self, surface, name, fraction, speed=4, color="red"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=4, endurance=5, color="red", x=3, y=8):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/niszczyciel.png")
 
     def typeOfShip(self):
         return "Niszczyciel"
 
 
 class Submarine(Ship):  # Okręt podwodny
-    def __init__(self, surface, name, fraction, speed=5, color="black"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=5, endurance=4, color="black", x=4, y=4):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/okret_podwodny.png")
 
     def typeOfShip(self):
         return "Okręt podwodny"
 
 
 class Motorboat(Ship):  # Motorówka
-    def __init__(self, surface, name, fraction, speed=6, color="white"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=6, endurance=1, color="white", x=3, y=5):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/motorowka.png")
 
     def typeOfShip(self):
         return "Motorówka"
 
 
 class Tanker(Ship):  # Tankowiec
-    def __init__(self, surface, name, fraction, speed=1, color="grey"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=1, endurance=2, color="grey", x=1, y=8):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/tankowiec.png")
 
     def typeOfShip(self):
         return "Tankowiec"
 
 
 class PassengerFerry(Ship):  # Prom pasażerski
-    def __init__(self, surface, name, fraction, speed=2, color="orange"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=2, endurance=3, color="orange", x=8, y=2):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/prom_pasazerski.png")
 
     def typeOfShip(self):
         return "Prom pasażerski"
 
 
 class Hovercraft(Ship):  # Poduszkowiec
-    def __init__(self, surface, name, fraction, speed=4, color="purple"):
-        super().__init__(surface, name, color, fraction, speed)
+    def __init__(self, surface, name, fraction, speed=4, endurance=2, color="purple", x=6, y=3):
+        super().__init__(surface, name, fraction, speed, endurance, color, x, y)
+        self.shipImage = pygame.image.load("./images/poduszkowiec.png")
 
     def typeOfShip(self):
         return "Poduszkowiec"
@@ -121,6 +134,7 @@ class FractionOne:
         self.passengerFerry1 = PassengerFerry(surface, "someName", self.name)
         self.passengerFerry2 = PassengerFerry(surface, "someName", self.name)
         # All speed = 29
+        # All endurance = 41
 
 
 class FractionTwo:
@@ -139,6 +153,7 @@ class FractionTwo:
         self.hovercraft1 = Hovercraft(surface, "someName", self.name)
         self.hovercraft2 = Hovercraft(surface, "someName", self.name)
         # All speed = 36
+        # All endurance = 29
 
 
 class FractionThree:
@@ -157,6 +172,7 @@ class FractionThree:
         self.hovercraft1 = Hovercraft(surface, "someName", self.name)
         self.hovercraft2 = Hovercraft(surface, "someName", self.name)
         # All speed = 33
+        # All endurance = 33
 
 
 class Game:
@@ -224,4 +240,4 @@ if __name__ == "__main__":
 # Jeśli pierwsza litera napotkanej frakcji będzie taka sama jaką ma dana frakcja to statki nie walczą
 # Każda 'kratka' ma mieć 50px i w takim razie każda ikona powinna mieć 48px
 # W sumie jest 300 pól. Niech 30 pól to będą wyspy skalne (10%) + 30 pól statki (10%)
-# Speed jest w granicach <1, 6>
+# Speed i endurance jest w granicach <1, 6>
