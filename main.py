@@ -6,7 +6,7 @@ import time
 
 WIDTH = 1000
 HEIGHT = 750
-SIZE = 48
+SIZE = 50
 # 10 frakcji z których będzie losowanie
 FRACTION_LIST = ["Pirates", "Poland", "Sparrows",
                  "Avengers", "United", "Soccers", "Assassins", "Titans", "Students", "Idk"]
@@ -27,6 +27,10 @@ class Ship(ABC):
     def typeOfShip(self):
         pass
 
+    def draw(self, image):
+        self.surface.blit(image, (self.x, self.y))
+        pygame.display.flip()
+
     def sayHello(self):
         print(
             f"Hi, my name is {self.name} and my class is {self.typeOfShip()}. My color is {self.color}, my fraction is {self.fraction}, and I have speed equal to {self.speed}!")
@@ -40,6 +44,9 @@ class AircraftCarrier(Ship):  # Lotniskowiec
     def typeOfShip(self):
         return "Lotniskowiec"
 
+    def draw(self):
+        super().draw(self.shipImage)
+
 
 class Battleship(Ship):  # Pancernik
     def __init__(self, surface, name, fraction, speed=2, endurance=6, color="brown", x=2, y=2):
@@ -48,6 +55,9 @@ class Battleship(Ship):  # Pancernik
 
     def typeOfShip(self):
         return "Pancernik"
+
+    def draw(self):
+        super().draw(self.shipImage)
 
 
 class Cruiser(Ship):  # Krążownik
@@ -58,6 +68,9 @@ class Cruiser(Ship):  # Krążownik
     def typeOfShip(self):
         return "Krążownik"
 
+    def draw(self):
+        super().draw(self.shipImage)
+
 
 class Destroyer(Ship):  # Niszczyciel
     def __init__(self, surface, name, fraction, speed=4, endurance=5, color="red", x=3, y=8):
@@ -66,6 +79,9 @@ class Destroyer(Ship):  # Niszczyciel
 
     def typeOfShip(self):
         return "Niszczyciel"
+
+    def draw(self):
+        super().draw(self.shipImage)
 
 
 class Submarine(Ship):  # Okręt podwodny
@@ -76,6 +92,9 @@ class Submarine(Ship):  # Okręt podwodny
     def typeOfShip(self):
         return "Okręt podwodny"
 
+    def draw(self):
+        super().draw(self.shipImage)
+
 
 class Motorboat(Ship):  # Motorówka
     def __init__(self, surface, name, fraction, speed=6, endurance=1, color="white", x=3, y=5):
@@ -84,6 +103,9 @@ class Motorboat(Ship):  # Motorówka
 
     def typeOfShip(self):
         return "Motorówka"
+
+    def draw(self):
+        super().draw(self.shipImage)
 
 
 class Tanker(Ship):  # Tankowiec
@@ -94,6 +116,9 @@ class Tanker(Ship):  # Tankowiec
     def typeOfShip(self):
         return "Tankowiec"
 
+    def draw(self):
+        super().draw(self.shipImage)
+
 
 class PassengerFerry(Ship):  # Prom pasażerski
     def __init__(self, surface, name, fraction, speed=2, endurance=3, color="orange", x=8, y=2):
@@ -103,6 +128,9 @@ class PassengerFerry(Ship):  # Prom pasażerski
     def typeOfShip(self):
         return "Prom pasażerski"
 
+    def draw(self):
+        super().draw(self.shipImage)
+
 
 class Hovercraft(Ship):  # Poduszkowiec
     def __init__(self, surface, name, fraction, speed=4, endurance=2, color="purple", x=6, y=3):
@@ -111,6 +139,9 @@ class Hovercraft(Ship):  # Poduszkowiec
 
     def typeOfShip(self):
         return "Poduszkowiec"
+
+    def draw(self):
+        super().draw(self.shipImage)
 
 
 class RockIsland:  # Wyspa skalna
@@ -192,6 +223,11 @@ class Game:
         self.fraction1 = FractionOne(self.surface, self.fractions[0])
         self.fraction2 = FractionTwo(self.surface, self.fractions[1])
         self.fraction3 = FractionThree(self.surface, self.fractions[2])
+
+        self.fraction2.aircraftCarrier1.draw()
+        self.fraction2.aircraftCarrier2.draw()
+        self.fraction1.battleship3.draw()
+        self.fraction1.cruiser1.draw()
 
     def drawGrid(self, rows, columns):
         sizeBlockInX = WIDTH // columns  # 50px
