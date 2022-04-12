@@ -100,9 +100,63 @@ class Hovercraft(Ship):  # Poduszkowiec
         return "Poduszkowiec"
 
 
-class rockIsland:  # Wyspa skalna
+class RockIsland:  # Wyspa skalna
     def __init__(self):
         pass
+
+
+class FractionOne:
+    def __init__(self, surface, fractionName):
+        self.name = fractionName
+
+        self.battleship1 = Battleship(surface, "someName", self.name)
+        self.battleship2 = Battleship(surface, "someName", self.name)
+        self.battleship3 = Battleship(surface, "someName", self.name)
+        self.cruiser1 = Cruiser(surface, "someName", self.name)
+        self.cruiser2 = Cruiser(surface, "someName", self.name)
+        self.cruiser3 = Cruiser(surface, "someName", self.name)
+
+        self.submarine1 = Submarine(surface, "someName", self.name)
+        self.submarine2 = Submarine(surface, "someName", self.name)
+        self.passengerFerry1 = PassengerFerry(surface, "someName", self.name)
+        self.passengerFerry2 = PassengerFerry(surface, "someName", self.name)
+        # All speed = 29
+
+
+class FractionTwo:
+    def __init__(self, surface, fractionName):
+        self.name = fractionName
+
+        self.aircraftCarrier1 = AircraftCarrier(surface, "someName", self.name)
+        self.aircraftCarrier2 = AircraftCarrier(surface, "someName", self.name)
+        self.aircraftCarrier3 = AircraftCarrier(surface, "someName", self.name)
+        self.motorboat1 = Motorboat(surface, "someName", self.name)
+        self.motorboat2 = Motorboat(surface, "someName", self.name)
+        self.motorboat3 = Motorboat(surface, "someName", self.name)
+
+        self.passengerFerry = PassengerFerry(surface, "someName", self.name)
+        self.submarine = Submarine(surface, "someName", self.name)
+        self.hovercraft1 = Hovercraft(surface, "someName", self.name)
+        self.hovercraft2 = Hovercraft(surface, "someName", self.name)
+        # All speed = 36
+
+
+class FractionThree:
+    def __init__(self, surface, fractionName):
+        self.name = fractionName
+
+        self.destroyer1 = Destroyer(surface, "someName", self.name)
+        self.destroyer2 = Destroyer(surface, "someName", self.name)
+        self.destroyer3 = Destroyer(surface, "someName", self.name)
+        self.tanker1 = Tanker(surface, "someName", self.name)
+        self.tanker2 = Tanker(surface, "someName", self.name)
+        self.tanker3 = Tanker(surface, "someName", self.name)
+
+        self.submarine1 = Submarine(surface, "someName", self.name)
+        self.submarine2 = Submarine(surface, "someName", self.name)
+        self.hovercraft1 = Hovercraft(surface, "someName", self.name)
+        self.hovercraft2 = Hovercraft(surface, "someName", self.name)
+        # All speed = 33
 
 
 class Game:
@@ -119,8 +173,9 @@ class Game:
         pygame.display.flip()
 
         self.drawFraction()
-        self.statek = Motorboat(self.surface, "Pogromca", "Avengers")
-        self.statek.sayHello()
+        self.fraction1 = FractionOne(self.surface, self.fractions[0])
+        self.fraction2 = FractionTwo(self.surface, self.fractions[1])
+        self.fraction3 = FractionThree(self.surface, self.fractions[2])
 
     def drawGrid(self, rows, columns):
         sizeBlockInX = WIDTH // columns  # 50px
@@ -147,8 +202,6 @@ class Game:
             randomFraction = FRACTION_LIST[random.randint(0, randomEnd)]
             self.fractions.append(randomFraction)
             FRACTION_LIST.remove(randomFraction)
-
-        print(self.fractions)
 
     def run(self):
         running = True
