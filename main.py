@@ -4,12 +4,12 @@ from pygame.locals import *
 import random
 import time
 
-WIDTH = 1000
+WIDTH = 1500
 HEIGHT = 750
 SIZE = 50
 # 10 frakcji z których będzie losowanie
 FRACTION_LIST = ["Pirates", "Poland", "Sparrows",
-                 "Avengers", "United", "Soccers", "Assassins", "Titans", "Students", "Idk"]
+                 "Avengers", "United", "Soccers", "Assassins", "Titans", "Students", "Aliens"]
 
 
 class Ship(ABC):
@@ -295,17 +295,19 @@ class Game:
         self.fraction2 = FractionTwo(self.surface, self.fractions[1])
         self.fraction3 = FractionThree(self.surface, self.fractions[2])
 
-        self.drawAllShips()  # rysuj statki
+        self.allShips()
+        self.drawAllShips(self.allShipsOnBoard)  # rysuj statki
+        self.deadShips = []
 
     def drawGrid(self, rows, columns):
-        sizeBlockInX = WIDTH // columns  # 50px
+        sizeBlockInX = (WIDTH-500) // columns  # 50px
         sizeBlockInY = HEIGHT // rows  # 50px
 
         x = 0
         y = 0
         for i in range(rows):
             y += sizeBlockInY
-            pygame.draw.line(self.surface, (255, 255, 255), (0, y), (WIDTH, y))
+            pygame.draw.line(self.surface, (255, 255, 255), (0, y), ((WIDTH-500), y))
 
         for i in range(columns):
             x += sizeBlockInX
@@ -323,11 +325,20 @@ class Game:
             self.fractions.append(randomFraction)
             FRACTION_LIST.remove(randomFraction)
 
-    def drawAllShips(self):
-        for i in range(10):
-            self.fraction1.allMyShips[i].draw()
-            self.fraction2.allMyShips[i].draw()
-            self.fraction3.allMyShips[i].draw()
+    def clearScreen(self):
+        self.surface.fill((0, 0, 255))
+        self.drawGrid(15, 20)
+        pygame.display.flip()
+
+    def allShips(self):
+        self.allShipsOnBoard = []
+        self.allShipsOnBoard.extend(self.fraction1.allMyShips)
+        self.allShipsOnBoard.extend(self.fraction2.allMyShips)
+        self.allShipsOnBoard.extend(self.fraction3.allMyShips)
+
+    def drawAllShips(self, allShips):
+        for i in range(len(allShips)):
+            allShips[i].draw()
 
     def moveAllShips(self):
         for i in range(10):
@@ -335,45 +346,64 @@ class Game:
             self.fraction2.allMyShips[i].move()
             self.fraction3.allMyShips[i].move()
 
-    def clearScreen(self):
-        self.surface.fill((0, 0, 255))
-        self.drawGrid(15, 20)
-        pygame.display.flip()
-
-    def isCollision(self, x1, y1, x2, y2):
-        if x1 == x2 and y1 == y2:
-            return True
-        return False
-
     def shipsOnBoard(self, shipsToRemove):
-        self.allShipsOnBoard = []
-        self.allShipsOnBoard.extend(self.fraction1.allMyShips)
-        self.allShipsOnBoard.extend(self.fraction2.allMyShips)
-        self.allShipsOnBoard.extend(self.fraction3.allMyShips)
         if len(shipsToRemove) > 0:
             for i in range(len(self.allShipsOnBoard)):
                 for j in range(len(shipsToRemove)):
                     if self.allShipsOnBoard[i] == shipsToRemove[j]:
                         self.allShipsOnBoard.remove(shipsToRemove[j])
         
-        return self.allShipsOnBoard
+        self.drawAllShips(self.allShipsOnBoard)
+        print(shipsToRemove)
 
-    def fight(self):
-        pass
+    def isCollision(self, x1, y1, x2, y2):
+        if x1 == x2 and y1 == y2:
+            return True
+        return False
+
+    def fight(self, ship1, ship2):        
+        if ship1.strength > ship2.strength:
+            self.deadShips.append(ship2)
+        elif ship1.strength < ship2.strength:
+            self.deadShips.append(ship1)
+
+    def displayInfo(self):
+        headerFont = pygame.font.SysFont("Arial", 30)
+        font = pygame.font.SysFont("Arial", 20)
+
+        for k in range(len(self.allShipsOnBoard)):
+            if self.allShipsOnBoard[k].fraction == self.fraction1.name:
+                info = font.render(f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                self.surface.blit(info, (1010, 115+(k*25)))
+
+            elif self.allShipsOnBoard[k].fraction == self.fraction2.name:
+                info = font.render(f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                self.surface.blit(info, (1300, 115+((k-10)*25)))
+
+            elif self.allShipsOnBoard[k].fraction == self.fraction3.name:
+                info = font.render(f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                self.surface.blit(info, (1010, 440+((k-20)*25)))
+
+        info = headerFont.render(f"STATUS WALKI: ", True, (200, 200, 200))
+        info1 = font.render(f"Frakcja - {self.fraction1.name}", True, (200, 200, 200))
+        info2 = font.render(f"Frakcja - {self.fraction2.name}", True, (200, 200, 200))
+        info3 = font.render(f"Frakcja - {self.fraction3.name}", True, (200, 200, 200))
+        self.surface.blit(info, (1150, 10))
+        self.surface.blit(info1, (1010, 65))
+        self.surface.blit(info2, (1300, 65))
+        self.surface.blit(info3, (1010, 390))
+        pygame.display.flip()
 
     def play(self):
         self.moveAllShips()
         self.clearScreen()
-        self.drawAllShips()
-
-        self.deadShips = []
         self.shipsOnBoard(self.deadShips)
+        self.displayInfo()
         
-        # print(self.allShipsOnBoard[1].fraction[0])
         for i in range(len(self.allShipsOnBoard)):
             for j in range(len(self.allShipsOnBoard)):
                 if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
-                    self.fight()
+                    self.fight(self.allShipsOnBoard[i], self.allShipsOnBoard[j])
 
     def run(self):
         running = True
@@ -388,7 +418,7 @@ class Game:
                     running = False
 
             self.play()
-            time.sleep(0.3)
+            time.sleep(0.2)  # Tutaj najlepiej pasuje 0.3
 
 
 if __name__ == "__main__":
