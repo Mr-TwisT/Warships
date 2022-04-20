@@ -192,10 +192,14 @@ class FractionOne:
         self.cruiser2 = Cruiser(surface, "Krążownik2", self.name, 2, 2)
         self.cruiser3 = Cruiser(surface, "Krążownik3", self.name, 3, 1)
 
-        self.submarine1 = Submarine(surface, "Okręt podwodny1", self.name, 2, 3)
-        self.submarine2 = Submarine(surface, "Okręt podwodny2", self.name, 3, 2)
-        self.passengerFerry1 = PassengerFerry(surface, "Prom pasażerski1", self.name, 1, 2)
-        self.passengerFerry2 = PassengerFerry(surface, "Prom pasażerski2", self.name, 2, 1)
+        self.submarine1 = Submarine(
+            surface, "Okręt podwodny1", self.name, 2, 3)
+        self.submarine2 = Submarine(
+            surface, "Okręt podwodny2", self.name, 3, 2)
+        self.passengerFerry1 = PassengerFerry(
+            surface, "Prom pasażerski1", self.name, 1, 2)
+        self.passengerFerry2 = PassengerFerry(
+            surface, "Prom pasażerski2", self.name, 2, 1)
 
         self.allMyShips = [
             self.battleship1,
@@ -217,17 +221,23 @@ class FractionTwo:
     def __init__(self, surface, fractionName):
         self.name = fractionName
 
-        self.aircraftCarrier1 = AircraftCarrier(surface, "Lotniskowiec1", self.name, 16, 2)
-        self.aircraftCarrier2 = AircraftCarrier(surface, "Lotniskowiec2", self.name, 16, 3)
-        self.aircraftCarrier3 = AircraftCarrier(surface, "Lotniskowiec3", self.name, 17, 3)
+        self.aircraftCarrier1 = AircraftCarrier(
+            surface, "Lotniskowiec1", self.name, 16, 2)
+        self.aircraftCarrier2 = AircraftCarrier(
+            surface, "Lotniskowiec2", self.name, 16, 3)
+        self.aircraftCarrier3 = AircraftCarrier(
+            surface, "Lotniskowiec3", self.name, 17, 3)
         self.motorboat1 = Motorboat(surface, "Motorówka1", self.name, 16, 1)
         self.motorboat2 = Motorboat(surface, "Motorówka2", self.name, 17, 2)
         self.motorboat3 = Motorboat(surface, "Motorówka3", self.name, 18, 3)
 
-        self.passengerFerry = PassengerFerry(surface, "Prom pasażerski", self.name, 18, 1)
+        self.passengerFerry = PassengerFerry(
+            surface, "Prom pasażerski", self.name, 18, 1)
         self.submarine = Submarine(surface, "Okręt podwodny", self.name, 15, 4)
-        self.hovercraft1 = Hovercraft(surface, "Poduszkowiec1", self.name, 17, 1)
-        self.hovercraft2 = Hovercraft(surface, "Poduszkowiec2", self.name, 18, 2)
+        self.hovercraft1 = Hovercraft(
+            surface, "Poduszkowiec1", self.name, 17, 1)
+        self.hovercraft2 = Hovercraft(
+            surface, "Poduszkowiec2", self.name, 18, 2)
 
         self.allMyShips = [
             self.aircraftCarrier1,
@@ -256,10 +266,14 @@ class FractionThree:
         self.tanker2 = Tanker(surface, "Tankowiec2", self.name, 9, 13)
         self.tanker3 = Tanker(surface, "Tankowiec3", self.name, 10, 13)
 
-        self.submarine1 = Submarine(surface, "Okręt podwodny1", self.name, 9, 12)
-        self.submarine2 = Submarine(surface, "Okręt podwodny2", self.name, 9, 10)
-        self.hovercraft1 = Hovercraft(surface, "Poduszkowiec1", self.name, 7, 13)
-        self.hovercraft2 = Hovercraft(surface, "Poduszkowiec2", self.name, 11, 13)
+        self.submarine1 = Submarine(
+            surface, "Okręt podwodny1", self.name, 9, 12)
+        self.submarine2 = Submarine(
+            surface, "Okręt podwodny2", self.name, 9, 10)
+        self.hovercraft1 = Hovercraft(
+            surface, "Poduszkowiec1", self.name, 7, 13)
+        self.hovercraft2 = Hovercraft(
+            surface, "Poduszkowiec2", self.name, 11, 13)
 
         self.allMyShips = [
             self.destroyer1,
@@ -307,7 +321,8 @@ class Game:
         y = 0
         for i in range(rows):
             y += sizeBlockInY
-            pygame.draw.line(self.surface, (255, 255, 255), (0, y), ((WIDTH-500), y))
+            pygame.draw.line(self.surface, (255, 255, 255),
+                             (0, y), ((WIDTH-500), y))
 
         for i in range(columns):
             x += sizeBlockInX
@@ -347,13 +362,13 @@ class Game:
             self.fraction3.allMyShips[i].move()
 
     def shipsOnBoard(self, shipsToRemove):
+        copyOfAllShipsOnBoard = self.allShipsOnBoard.copy()
         if len(shipsToRemove) > 0:
-            for i in range(len(self.allShipsOnBoard)):
+            for i in range(len(copyOfAllShipsOnBoard)):
                 for j in range(len(shipsToRemove)):
-                    if self.allShipsOnBoard[i] == shipsToRemove[j]:
+                    if copyOfAllShipsOnBoard[i] == shipsToRemove[j]:
                         self.allShipsOnBoard.remove(shipsToRemove[j])
-        
-        self.drawAllShips(self.allShipsOnBoard)
+
         print(shipsToRemove)
 
     def isCollision(self, x1, y1, x2, y2):
@@ -361,33 +376,45 @@ class Game:
             return True
         return False
 
-    def fight(self, ship1, ship2):        
+    def fight(self, ship1, ship2):
         if ship1.strength > ship2.strength:
             self.deadShips.append(ship2)
         elif ship1.strength < ship2.strength:
             self.deadShips.append(ship1)
+        elif ship1.strength == ship2.strength:
+            print("Ta sama siła!")
 
     def displayInfo(self):
         headerFont = pygame.font.SysFont("Arial", 30)
         font = pygame.font.SysFont("Arial", 20)
+        i = -1
+        j = -1
 
         for k in range(len(self.allShipsOnBoard)):
             if self.allShipsOnBoard[k].fraction == self.fraction1.name:
-                info = font.render(f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                info = font.render(
+                    f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
                 self.surface.blit(info, (1010, 115+(k*25)))
 
             elif self.allShipsOnBoard[k].fraction == self.fraction2.name:
-                info = font.render(f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
-                self.surface.blit(info, (1300, 115+((k-10)*25)))
+                i += 1
+                info = font.render(
+                    f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                self.surface.blit(info, (1300, 115+(i*25)))
 
             elif self.allShipsOnBoard[k].fraction == self.fraction3.name:
-                info = font.render(f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
-                self.surface.blit(info, (1010, 440+((k-20)*25)))
+                j += 1
+                info = font.render(
+                    f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                self.surface.blit(info, (1010, 440+(j*25)))
 
         info = headerFont.render(f"STATUS WALKI: ", True, (200, 200, 200))
-        info1 = font.render(f"Frakcja - {self.fraction1.name}", True, (200, 200, 200))
-        info2 = font.render(f"Frakcja - {self.fraction2.name}", True, (200, 200, 200))
-        info3 = font.render(f"Frakcja - {self.fraction3.name}", True, (200, 200, 200))
+        info1 = font.render(
+            f"Frakcja - {self.fraction1.name}", True, (200, 200, 200))
+        info2 = font.render(
+            f"Frakcja - {self.fraction2.name}", True, (200, 200, 200))
+        info3 = font.render(
+            f"Frakcja - {self.fraction3.name}", True, (200, 200, 200))
         self.surface.blit(info, (1150, 10))
         self.surface.blit(info1, (1010, 65))
         self.surface.blit(info2, (1300, 65))
@@ -395,15 +422,29 @@ class Game:
         pygame.display.flip()
 
     def play(self):
+        copyOfDeadShips = []
+
         self.moveAllShips()
         self.clearScreen()
-        self.shipsOnBoard(self.deadShips)
+
+        if copyOfDeadShips != self.deadShips:
+            self.shipsOnBoard(self.deadShips)  # Sprawdz to!
+        copyOfDeadShips = self.deadShips.copy()
+
+        self.drawAllShips(self.allShipsOnBoard)
         self.displayInfo()
-        
+
         for i in range(len(self.allShipsOnBoard)):
-            for j in range(len(self.allShipsOnBoard)):
-                if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
-                    self.fight(self.allShipsOnBoard[i], self.allShipsOnBoard[j])
+            if (i+1) < len(self.allShipsOnBoard):
+                for j in range(i+1, len(self.allShipsOnBoard)):
+                    if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
+                        self.fight(
+                            self.allShipsOnBoard[i], self.allShipsOnBoard[j])
+            elif (i+1) == len(self.allShipsOnBoard):
+                for j in range(len(self.allShipsOnBoard)-1):
+                    if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
+                        self.fight(
+                            self.allShipsOnBoard[i], self.allShipsOnBoard[j])
 
     def run(self):
         running = True
