@@ -81,7 +81,7 @@ class AircraftCarrier(Ship):  # Lotniskowiec
 
 
 class Battleship(Ship):  # Pancernik
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=2, endurance=6, strength=6, color="brown"):
+    def __init__(self, surface, name, fraction, x=0, y=0, speed=2, endurance=6, strength=5, color="brown"):
         super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/pancernik.png")
 
@@ -302,6 +302,7 @@ class Game:
         self.surface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.surface.fill((0, 0, 255))
         self.drawGrid(15, 20)
+        self.displayHeader()
         pygame.display.flip()
 
         self.drawFraction()  # losuj frakcje
@@ -311,7 +312,10 @@ class Game:
 
         self.allShips()
         self.drawAllShips(self.allShipsOnBoard)  # rysuj statki
+        self.displayInfo()
+
         self.deadShips = []
+        self.copyOfDeadShips = []
 
     def drawGrid(self, rows, columns):
         sizeBlockInX = (WIDTH-500) // columns  # 50px
@@ -343,6 +347,8 @@ class Game:
     def clearScreen(self):
         self.surface.fill((0, 0, 255))
         self.drawGrid(15, 20)
+        self.displayHeader()
+        self.displayInfo()
         pygame.display.flip()
 
     def allShips(self):
@@ -384,8 +390,12 @@ class Game:
         elif ship1.strength == ship2.strength:
             print("Ta sama siła!")
 
-    def displayInfo(self):
+    def displayHeader(self):
         headerFont = pygame.font.SysFont("Arial", 30)
+        info = headerFont.render("STATUS WALKI: ", True, (200, 200, 200))
+        self.surface.blit(info, (1150, 10))
+
+    def displayInfo(self):
         font = pygame.font.SysFont("Arial", 20)
         i = -1
         j = -1
@@ -408,40 +418,31 @@ class Game:
                     f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
                 self.surface.blit(info, (1010, 440+(j*25)))
 
-        info = headerFont.render(f"STATUS WALKI: ", True, (200, 200, 200))
         info1 = font.render(
             f"Frakcja - {self.fraction1.name}", True, (200, 200, 200))
         info2 = font.render(
             f"Frakcja - {self.fraction2.name}", True, (200, 200, 200))
         info3 = font.render(
             f"Frakcja - {self.fraction3.name}", True, (200, 200, 200))
-        self.surface.blit(info, (1150, 10))
+
         self.surface.blit(info1, (1010, 65))
         self.surface.blit(info2, (1300, 65))
         self.surface.blit(info3, (1010, 390))
-        pygame.display.flip()
 
     def play(self):
-        copyOfDeadShips = []
-
         self.moveAllShips()
         self.clearScreen()
 
-        if copyOfDeadShips != self.deadShips:
-            self.shipsOnBoard(self.deadShips)  # Sprawdz to!
-        copyOfDeadShips = self.deadShips.copy()
+        if self.copyOfDeadShips != self.deadShips:
+            self.shipsOnBoard(self.deadShips)
 
         self.drawAllShips(self.allShipsOnBoard)
-        self.displayInfo()
+
+        self.copyOfDeadShips = self.deadShips.copy()
 
         for i in range(len(self.allShipsOnBoard)):
             if (i+1) < len(self.allShipsOnBoard):
-                for j in range(i+1, len(self.allShipsOnBoard)):
-                    if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
-                        self.fight(
-                            self.allShipsOnBoard[i], self.allShipsOnBoard[j])
-            elif (i+1) == len(self.allShipsOnBoard):
-                for j in range(len(self.allShipsOnBoard)-1):
+                for j in range((i+1), len(self.allShipsOnBoard)):
                     if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
                         self.fight(
                             self.allShipsOnBoard[i], self.allShipsOnBoard[j])
@@ -459,7 +460,7 @@ class Game:
                     running = False
 
             self.play()
-            time.sleep(0.2)  # Tutaj najlepiej pasuje 0.3
+            time.sleep(0.2)  # Tutaj najlepiej pasuje 0.2 lub 0.3
 
 
 if __name__ == "__main__":
@@ -470,3 +471,4 @@ if __name__ == "__main__":
 # Jeśli pierwsza litera napotkanej frakcji będzie taka sama jaką ma dana frakcja to statki nie walczą
 # W sumie jest 300 pól. Niech 30 pól to będą wyspy skalne (10%) + 30 pól statki (10%)
 # Speed, endurance i strength jest w granicach <1, 6>
+# Dodać kolory do info z boku
