@@ -375,8 +375,6 @@ class Game:
                     if copyOfAllShipsOnBoard[i] == shipsToRemove[j]:
                         self.allShipsOnBoard.remove(shipsToRemove[j])
 
-        print(shipsToRemove)
-
     def isCollision(self, x1, y1, x2, y2):
         if x1 == x2 and y1 == y2:
             return True
@@ -387,8 +385,6 @@ class Game:
             self.deadShips.append(ship2)
         elif ship1.strength < ship2.strength:
             self.deadShips.append(ship1)
-        elif ship1.strength == ship2.strength:
-            print("Ta sama siła!")
 
     def displayHeader(self):
         headerFont = pygame.font.SysFont("Arial", 30)
@@ -404,19 +400,31 @@ class Game:
             if self.allShipsOnBoard[k].fraction == self.fraction1.name:
                 info = font.render(
                     f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                smallColor = pygame.transform.scale(
+                    self.allShipsOnBoard[k].shipImage, (20, 20))
                 self.surface.blit(info, (1010, 115+(k*25)))
+                self.surface.blit(
+                    smallColor, (1020 + info.get_width(), 115+(k*25)))
 
             elif self.allShipsOnBoard[k].fraction == self.fraction2.name:
                 i += 1
                 info = font.render(
                     f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
-                self.surface.blit(info, (1300, 115+(i*25)))
+                smallColor = pygame.transform.scale(
+                    self.allShipsOnBoard[k].shipImage, (20, 20))
+                self.surface.blit(info, (1280, 115+(i*25)))
+                self.surface.blit(
+                    smallColor, (1290 + info.get_width(), 115+(i*25)))
 
             elif self.allShipsOnBoard[k].fraction == self.fraction3.name:
                 j += 1
                 info = font.render(
                     f"Statek: {self.allShipsOnBoard[k].name}", True, (200, 200, 200))
+                smallColor = pygame.transform.scale(
+                    self.allShipsOnBoard[k].shipImage, (20, 20))
                 self.surface.blit(info, (1010, 440+(j*25)))
+                self.surface.blit(
+                    smallColor, (1020 + info.get_width(), 440+(j*25)))
 
         info1 = font.render(
             f"Frakcja - {self.fraction1.name}", True, (200, 200, 200))
@@ -426,7 +434,7 @@ class Game:
             f"Frakcja - {self.fraction3.name}", True, (200, 200, 200))
 
         self.surface.blit(info1, (1010, 65))
-        self.surface.blit(info2, (1300, 65))
+        self.surface.blit(info2, (1280, 65))
         self.surface.blit(info3, (1010, 390))
 
     def play(self):
@@ -471,4 +479,3 @@ if __name__ == "__main__":
 # Jeśli pierwsza litera napotkanej frakcji będzie taka sama jaką ma dana frakcja to statki nie walczą
 # W sumie jest 300 pól. Niech 30 pól to będą wyspy skalne (10%) + 30 pól statki (10%)
 # Speed, endurance i strength jest w granicach <1, 6>
-# Dodać kolory do info z boku
