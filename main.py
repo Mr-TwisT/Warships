@@ -35,28 +35,28 @@ class Ship(ABC):
         self.surface.blit(image, (self.x, self.y))
         pygame.display.flip()
 
-    def move(self):
+    def move(self, collision=False):
         directions = [1, 2, 3, 4]  # Góra, prawo, dół, lewo
         randomDirection = directions[random.randint(0, 3)]
         match randomDirection:
             case 1:
                 self.y -= SIZE
-                if self.y < (0*SIZE):
+                if (self.y < (0*SIZE)) or collision:
                     self.y += SIZE
                 return self.y
             case 2:
                 self.x += SIZE
-                if self.x > (19*SIZE):
+                if (self.x > (19*SIZE)) or collision:
                     self.x -= SIZE
                 return self.x
             case 3:
                 self.y += SIZE
-                if self.y > (14*SIZE):
+                if (self.y > (14*SIZE)) or collision:
                     self.y -= SIZE
                 return self.y
             case 4:
                 self.x -= SIZE
-                if self.x < (0*SIZE):
+                if (self.x < (0*SIZE)) or collision:
                     self.x += SIZE
                 return self.x
             case _:
@@ -177,8 +177,14 @@ class Hovercraft(Ship):  # Poduszkowiec
 
 
 class RockIsland:  # Wyspa skalna
-    def __init__(self):
-        pass
+    def __init__(self, surface, x, y):
+        self.rockIslandImage = pygame.image.load("./images/rock.png")
+        self.surface = surface
+        self.x = x
+        self.y = y
+
+    def display(self):
+        self.surface.blit(self.rockIslandImage, (self.x, self.y))
 
 
 class FractionOne:
@@ -311,7 +317,11 @@ class Game:
         self.fraction3 = FractionThree(self.surface, self.fractions[2])
 
         self.allShips()
-        self.drawAllShips(self.allShipsOnBoard)  # rysuj statki
+        self.drawAllShips(self.allShipsOnBoard, -1)  # rysuj statki
+
+        self.rockIslands = []
+        self.displayRockIslands()
+
         self.displayInfo()
 
         self.deadShips = []
@@ -333,6 +343,12 @@ class Game:
             pygame.draw.line(self.surface, (255, 255, 255),
                              (x, 0), (x, HEIGHT))
 
+    def allShips(self):
+        self.allShipsOnBoard = []
+        self.allShipsOnBoard.extend(self.fraction1.allMyShips)
+        self.allShipsOnBoard.extend(self.fraction2.allMyShips)
+        self.allShipsOnBoard.extend(self.fraction3.allMyShips)
+
     def drawFraction(self):
         self.fractions = []
         firstFraction = FRACTION_LIST[random.randint(0, 9)]
@@ -344,22 +360,32 @@ class Game:
             self.fractions.append(randomFraction)
             FRACTION_LIST.remove(randomFraction)
 
+    def displayRockIslands(self):
+        for i in range(30):
+            randomX = random.randint(0, 19)
+            randomY = random.randint(0, 14)
+            for j in range(len(self.allShipsOnBoard)):
+                while self.isCollision(self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y, randomX*SIZE, randomY*SIZE):
+                    randomX = random.randint(0, 19)
+                    randomY = random.randint(0, 14)
+            self.rockIslands.append(RockIsland(
+                self.surface, randomX*SIZE, randomY*SIZE))
+            self.rockIslands[i].display()
+            pygame.display.flip()
+
     def clearScreen(self):
         self.surface.fill((0, 0, 255))
         self.drawGrid(15, 20)
+        for i in range(30):
+            self.rockIslands[i].display()
         self.displayHeader()
         self.displayInfo()
         pygame.display.flip()
 
-    def allShips(self):
-        self.allShipsOnBoard = []
-        self.allShipsOnBoard.extend(self.fraction1.allMyShips)
-        self.allShipsOnBoard.extend(self.fraction2.allMyShips)
-        self.allShipsOnBoard.extend(self.fraction3.allMyShips)
-
-    def drawAllShips(self, allShips):
+    def drawAllShips(self, allShips, incorrectShip):
         for i in range(len(allShips)):
-            allShips[i].draw()
+            if i != incorrectShip:
+                allShips[i].draw()
 
     def moveAllShips(self):
         for i in range(10):
@@ -438,22 +464,30 @@ class Game:
         self.surface.blit(info3, (1010, 390))
 
     def play(self):
+        number = -1
         self.moveAllShips()
         self.clearScreen()
 
         if self.copyOfDeadShips != self.deadShips:
             self.shipsOnBoard(self.deadShips)
-
-        self.drawAllShips(self.allShipsOnBoard)
-
         self.copyOfDeadShips = self.deadShips.copy()
 
+        # Kolizja dwóch statków
         for i in range(len(self.allShipsOnBoard)):
             if (i+1) < len(self.allShipsOnBoard):
                 for j in range((i+1), len(self.allShipsOnBoard)):
                     if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
                         self.fight(
                             self.allShipsOnBoard[i], self.allShipsOnBoard[j])
+
+        # Kolizja statku ze skałą
+        for i in range(len(self.allShipsOnBoard)):
+            for j in range(len(self.rockIslands)):
+                if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.rockIslands[j].x, self.rockIslands[j].y):
+                    self.allShipsOnBoard[i].move(True)
+                    number = i
+
+        self.drawAllShips(self.allShipsOnBoard, number)
 
     def run(self):
         running = True
@@ -468,7 +502,7 @@ class Game:
                     running = False
 
             self.play()
-            time.sleep(0.2)  # Tutaj najlepiej pasuje 0.2 lub 0.3
+            time.sleep(0.25)  # Tutaj najlepiej pasuje 0.2 lub 0.3
 
 
 if __name__ == "__main__":
@@ -479,3 +513,7 @@ if __name__ == "__main__":
 # Jeśli pierwsza litera napotkanej frakcji będzie taka sama jaką ma dana frakcja to statki nie walczą
 # W sumie jest 300 pól. Niech 30 pól to będą wyspy skalne (10%) + 30 pól statki (10%)
 # Speed, endurance i strength jest w granicach <1, 6>
+
+# Zrobić lepszy system walki między statkami
+
+# Ten sam błąd co ciągle!!!
