@@ -13,11 +13,10 @@ FRACTION_LIST = ["Pirates", "Poland", "Sparrows",
 
 
 class Ship(ABC):
-    def __init__(self, surface, name, fraction, speed, endurance, strength, color, x, y):
+    def __init__(self, surface, name, fraction, endurance, strength, color, x, y):
         self.surface = surface
         self.name = name
         self.fraction = fraction
-        self.speed = speed
         self.endurance = endurance
         self.strength = strength
         self.color = color
@@ -35,29 +34,50 @@ class Ship(ABC):
         self.surface.blit(image, (self.x, self.y))
         pygame.display.flip()
 
-    def move(self, collision=False):
+    def move(self, rockX=-1, rockY=-1):
         directions = [1, 2, 3, 4]  # Góra, prawo, dół, lewo
         randomDirection = directions[random.randint(0, 3)]
+        print(self, rockX, rockY)
         match randomDirection:
             case 1:
-                self.y -= SIZE
-                if (self.y < (0*SIZE)) or collision:
+                if rockX != -1:
+                    if (self.y-SIZE) == rockY:
+                        self.y += SIZE
+                elif self.y < (0*SIZE):
                     self.y += SIZE
+                else:
+                    self.y -= SIZE
+
                 return self.y
             case 2:
-                self.x += SIZE
-                if (self.x > (19*SIZE)) or collision:
+                if rockX != -1:
+                    if (self.x+SIZE) == rockX:
+                        self.x -= SIZE
+                elif self.x > (19*SIZE):
                     self.x -= SIZE
+                else:
+                    self.x += SIZE
+
                 return self.x
             case 3:
-                self.y += SIZE
-                if (self.y > (14*SIZE)) or collision:
+                if rockX != -1:
+                    if (self.y+SIZE) == rockY:
+                        self.y -= SIZE
+                elif self.y > (14*SIZE):
                     self.y -= SIZE
+                else:
+                    self.y += SIZE
+
                 return self.y
             case 4:
-                self.x -= SIZE
-                if (self.x < (0*SIZE)) or collision:
+                if rockX != -1:
+                    if (self.x-SIZE) == rockX:
+                        self.x += SIZE
+                elif self.x < (0*SIZE):
                     self.x += SIZE
+                else:
+                    self.x -= SIZE
+
                 return self.x
             case _:
                 print("Error! Wynik jest niemożliwy!")
@@ -65,12 +85,12 @@ class Ship(ABC):
 
     def sayHello(self):
         print(
-            f"Hi, my name is {self.name} and my class is {self.typeOfShip()}. My color is {self.color}, my fraction is {self.fraction}, and I have speed equal to {self.speed}!")
+            f"Hi, my name is {self.name} and my class is {self.typeOfShip()}. My color is {self.color} and my fraction is {self.fraction}!")
 
 
 class AircraftCarrier(Ship):  # Lotniskowiec
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=1, endurance=5, strength=5, color="lightblue"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=5, strength=5, color="lightblue"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/lotniskowiec.png")
 
     def typeOfShip(self):
@@ -81,8 +101,8 @@ class AircraftCarrier(Ship):  # Lotniskowiec
 
 
 class Battleship(Ship):  # Pancernik
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=2, endurance=6, strength=5, color="brown"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=6, strength=4, color="brown"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/pancernik.png")
 
     def typeOfShip(self):
@@ -93,8 +113,8 @@ class Battleship(Ship):  # Pancernik
 
 
 class Cruiser(Ship):  # Krążownik
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=3, endurance=3, strength=4, color="green"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=2, strength=3, color="green"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/krazownik.png")
 
     def typeOfShip(self):
@@ -105,8 +125,8 @@ class Cruiser(Ship):  # Krążownik
 
 
 class Destroyer(Ship):  # Niszczyciel
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=4, endurance=5, strength=6, color="red"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=2, strength=6, color="red"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/niszczyciel.png")
 
     def typeOfShip(self):
@@ -117,8 +137,8 @@ class Destroyer(Ship):  # Niszczyciel
 
 
 class Submarine(Ship):  # Okręt podwodny
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=5, endurance=4, strength=4, color="black"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=4, strength=4, color="black"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/okret_podwodny.png")
 
     def typeOfShip(self):
@@ -129,8 +149,8 @@ class Submarine(Ship):  # Okręt podwodny
 
 
 class Motorboat(Ship):  # Motorówka
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=6, endurance=1, strength=2, color="white"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=3, strength=2, color="white"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/motorowka.png")
 
     def typeOfShip(self):
@@ -141,8 +161,8 @@ class Motorboat(Ship):  # Motorówka
 
 
 class Tanker(Ship):  # Tankowiec
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=1, endurance=2, strength=1, color="grey"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=2, strength=1, color="grey"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/tankowiec.png")
 
     def typeOfShip(self):
@@ -153,8 +173,8 @@ class Tanker(Ship):  # Tankowiec
 
 
 class PassengerFerry(Ship):  # Prom pasażerski
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=2, endurance=3, strength=1, color="orange"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=3, strength=1, color="orange"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/prom_pasazerski.png")
 
     def typeOfShip(self):
@@ -165,8 +185,8 @@ class PassengerFerry(Ship):  # Prom pasażerski
 
 
 class Hovercraft(Ship):  # Poduszkowiec
-    def __init__(self, surface, name, fraction, x=0, y=0, speed=4, endurance=2, strength=3, color="purple"):
-        super().__init__(surface, name, fraction, speed, endurance, strength, color, x, y)
+    def __init__(self, surface, name, fraction, x=0, y=0, endurance=2, strength=3, color="purple"):
+        super().__init__(surface, name, fraction, endurance, strength, color, x, y)
         self.shipImage = pygame.image.load("./images/poduszkowiec.png")
 
     def typeOfShip(self):
@@ -219,8 +239,8 @@ class FractionOne:
             self.passengerFerry1,
             self.passengerFerry2
         ]
-        # All speed = 29
-        # All endurance = 41
+        # All endurance = 38
+        # All strength = 31
 
 
 class FractionTwo:
@@ -257,8 +277,8 @@ class FractionTwo:
             self.hovercraft1,
             self.hovercraft2
         ]
-        # All speed = 36
-        # All endurance = 29
+        # All endurance = 35
+        # All strength = 32
 
 
 class FractionThree:
@@ -293,8 +313,8 @@ class FractionThree:
             self.hovercraft1,
             self.hovercraft2
         ]
-        # All speed = 33
         # All endurance = 33
+        # All strength = 35
 
 
 class Game:
@@ -317,11 +337,9 @@ class Game:
         self.fraction3 = FractionThree(self.surface, self.fractions[2])
 
         self.allShips()
-        self.drawAllShips(self.allShipsOnBoard, -1)  # rysuj statki
+        self.drawAllShips(self.allShipsOnBoard)  # rysuj statki
 
-        self.rockIslands = []
         self.displayRockIslands()
-
         self.displayInfo()
 
         self.deadShips = []
@@ -361,13 +379,17 @@ class Game:
             FRACTION_LIST.remove(randomFraction)
 
     def displayRockIslands(self):
-        for i in range(30):
+        self.rockIslands = []
+        for i in range(30):  # Ilość wysp skalnych
             randomX = random.randint(0, 19)
             randomY = random.randint(0, 14)
-            for j in range(len(self.allShipsOnBoard)):
+            j = -1
+            while j < (len(self.allShipsOnBoard)-1):
+                j += 1
                 while self.isCollision(self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y, randomX*SIZE, randomY*SIZE):
                     randomX = random.randint(0, 19)
                     randomY = random.randint(0, 14)
+                    j = 0
             self.rockIslands.append(RockIsland(
                 self.surface, randomX*SIZE, randomY*SIZE))
             self.rockIslands[i].display()
@@ -382,10 +404,9 @@ class Game:
         self.displayInfo()
         pygame.display.flip()
 
-    def drawAllShips(self, allShips, incorrectShip):
+    def drawAllShips(self, allShips):
         for i in range(len(allShips)):
-            if i != incorrectShip:
-                allShips[i].draw()
+            allShips[i].draw()
 
     def moveAllShips(self):
         for i in range(10):
@@ -401,16 +422,25 @@ class Game:
                     if copyOfAllShipsOnBoard[i] == shipsToRemove[j]:
                         self.allShipsOnBoard.remove(shipsToRemove[j])
 
-    def isCollision(self, x1, y1, x2, y2):
+    def isCollision(self, x1, y1, x2, y2, rock=False):
+        if rock:
+            if (((x1-SIZE) or x1 or (x1+SIZE)) == x2) and (((y1-SIZE) or y1 or (y1+SIZE)) == y2):
+                return True
+            else:
+                return False
+
         if x1 == x2 and y1 == y2:
             return True
         return False
 
     def fight(self, ship1, ship2):
-        if ship1.strength > ship2.strength:
-            self.deadShips.append(ship2)
-        elif ship1.strength < ship2.strength:
+        ship1.endurance -= ship2.strength
+        ship2.endurance -= ship1.strength
+
+        if ship1.endurance <= 0:
             self.deadShips.append(ship1)
+        elif ship2.endurance <= 0:
+            self.deadShips.append(ship2)
 
     def displayHeader(self):
         headerFont = pygame.font.SysFont("Arial", 30)
@@ -464,7 +494,6 @@ class Game:
         self.surface.blit(info3, (1010, 390))
 
     def play(self):
-        number = -1
         self.moveAllShips()
         self.clearScreen()
 
@@ -477,17 +506,21 @@ class Game:
             if (i+1) < len(self.allShipsOnBoard):
                 for j in range((i+1), len(self.allShipsOnBoard)):
                     if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.allShipsOnBoard[j].x, self.allShipsOnBoard[j].y) and (self.allShipsOnBoard[i].fraction[0] != self.allShipsOnBoard[j].fraction[0]):
+                        # print(
+                        #     f"Obrona: {self.allShipsOnBoard[i].name}, {self.allShipsOnBoard[i].endurance}")
+                        # print(
+                        #     f"Atak: {self.allShipsOnBoard[j].name}, {self.allShipsOnBoard[j].strength}")
                         self.fight(
                             self.allShipsOnBoard[i], self.allShipsOnBoard[j])
 
         # Kolizja statku ze skałą
         for i in range(len(self.allShipsOnBoard)):
             for j in range(len(self.rockIslands)):
-                if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.rockIslands[j].x, self.rockIslands[j].y):
-                    self.allShipsOnBoard[i].move(True)
-                    number = i
+                if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.rockIslands[j].x, self.rockIslands[j].y, True):
+                    self.allShipsOnBoard[i].move(
+                        self.rockIslands[j].x, self.rockIslands[j].y)
 
-        self.drawAllShips(self.allShipsOnBoard, number)
+        self.drawAllShips(self.allShipsOnBoard)
 
     def run(self):
         running = True
@@ -512,8 +545,4 @@ if __name__ == "__main__":
 # Każda frakcja będzie miała 3/4 rodzaje statków (w tym 2 wyjątkowe dla siebie - różne od pozostałych). W sumie na planszy niech będzie 30 statków (Po 10 dla każdej frakcji).
 # Jeśli pierwsza litera napotkanej frakcji będzie taka sama jaką ma dana frakcja to statki nie walczą
 # W sumie jest 300 pól. Niech 30 pól to będą wyspy skalne (10%) + 30 pól statki (10%)
-# Speed, endurance i strength jest w granicach <1, 6>
-
-# Zrobić lepszy system walki między statkami
-
-# Ten sam błąd co ciągle!!!
+# Endurance i strength jest w granicach <1, 6>
