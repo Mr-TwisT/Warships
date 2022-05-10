@@ -7,6 +7,7 @@ import time
 WIDTH = 1500
 HEIGHT = 750
 SIZE = 50
+ISLANDS_AMOUNT = 15  # Musi być > 0
 # 10 frakcji z których będzie losowanie
 FRACTION_LIST = ["Pirates", "Poland", "Sparrows",
                  "Avengers", "United", "Soccers", "Assassins", "Titans", "Students", "Aliens"]
@@ -37,13 +38,12 @@ class Ship(ABC):
     def move(self, rockX=-1, rockY=-1):
         directions = [1, 2, 3, 4]  # Góra, prawo, dół, lewo
         randomDirection = directions[random.randint(0, 3)]
-        print(self, rockX, rockY)
         match randomDirection:
             case 1:
                 if rockX != -1:
                     if (self.y-SIZE) == rockY:
                         self.y += SIZE
-                elif self.y < (0*SIZE):
+                elif self.y <= (0*SIZE):
                     self.y += SIZE
                 else:
                     self.y -= SIZE
@@ -53,7 +53,7 @@ class Ship(ABC):
                 if rockX != -1:
                     if (self.x+SIZE) == rockX:
                         self.x -= SIZE
-                elif self.x > (19*SIZE):
+                elif self.x >= (19*SIZE):
                     self.x -= SIZE
                 else:
                     self.x += SIZE
@@ -63,7 +63,7 @@ class Ship(ABC):
                 if rockX != -1:
                     if (self.y+SIZE) == rockY:
                         self.y -= SIZE
-                elif self.y > (14*SIZE):
+                elif self.y >= (14*SIZE):
                     self.y -= SIZE
                 else:
                     self.y += SIZE
@@ -73,7 +73,7 @@ class Ship(ABC):
                 if rockX != -1:
                     if (self.x-SIZE) == rockX:
                         self.x += SIZE
-                elif self.x < (0*SIZE):
+                elif self.x <= (0*SIZE):
                     self.x += SIZE
                 else:
                     self.x -= SIZE
@@ -337,7 +337,7 @@ class Game:
         self.fraction3 = FractionThree(self.surface, self.fractions[2])
 
         self.allShips()
-        self.drawAllShips(self.allShipsOnBoard)  # rysuj statki
+        self.drawAllShips()  # rysuj statki
 
         self.displayRockIslands()
         self.displayInfo()
@@ -380,7 +380,7 @@ class Game:
 
     def displayRockIslands(self):
         self.rockIslands = []
-        for i in range(30):  # Ilość wysp skalnych
+        for i in range(ISLANDS_AMOUNT):
             randomX = random.randint(0, 19)
             randomY = random.randint(0, 14)
             j = -1
@@ -398,21 +398,26 @@ class Game:
     def clearScreen(self):
         self.surface.fill((0, 0, 255))
         self.drawGrid(15, 20)
-        for i in range(30):
+        for i in range(len(self.rockIslands)):
             self.rockIslands[i].display()
         self.displayHeader()
         self.displayInfo()
         pygame.display.flip()
 
-    def drawAllShips(self, allShips):
-        for i in range(len(allShips)):
-            allShips[i].draw()
+    def drawAllShips(self):
+        for i in range(len(self.allShipsOnBoard)):
+            self.allShipsOnBoard[i].draw()
 
     def moveAllShips(self):
-        for i in range(10):
-            self.fraction1.allMyShips[i].move()
-            self.fraction2.allMyShips[i].move()
-            self.fraction3.allMyShips[i].move()
+        for i in range(len(self.allShipsOnBoard)):
+            copyOfI = i
+            for j in range(len(self.rockIslands)):
+                if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.rockIslands[j].x, self.rockIslands[j].y, True):
+                    copyOfI += 1
+                    self.allShipsOnBoard[i].move(
+                        self.rockIslands[j].x, self.rockIslands[j].y)
+                elif (j+1 == len(self.rockIslands)) and (copyOfI == i):
+                    self.allShipsOnBoard[i].move()
 
     def shipsOnBoard(self, shipsToRemove):
         copyOfAllShipsOnBoard = self.allShipsOnBoard.copy()
@@ -424,7 +429,7 @@ class Game:
 
     def isCollision(self, x1, y1, x2, y2, rock=False):
         if rock:
-            if (((x1-SIZE) or x1 or (x1+SIZE)) == x2) and (((y1-SIZE) or y1 or (y1+SIZE)) == y2):
+            if (((x1-SIZE) == x2) and (y1 == y2)) or (((x1+SIZE) == x2) and (y1 == y2)) or (((y1-SIZE) == y2) and (x1 == x2)) or (((y1+SIZE) == y2) and (x1 == x2)):
                 return True
             else:
                 return False
@@ -496,6 +501,7 @@ class Game:
     def play(self):
         self.moveAllShips()
         self.clearScreen()
+        self.drawAllShips()
 
         if self.copyOfDeadShips != self.deadShips:
             self.shipsOnBoard(self.deadShips)
@@ -513,15 +519,6 @@ class Game:
                         self.fight(
                             self.allShipsOnBoard[i], self.allShipsOnBoard[j])
 
-        # Kolizja statku ze skałą
-        for i in range(len(self.allShipsOnBoard)):
-            for j in range(len(self.rockIslands)):
-                if self.isCollision(self.allShipsOnBoard[i].x, self.allShipsOnBoard[i].y, self.rockIslands[j].x, self.rockIslands[j].y, True):
-                    self.allShipsOnBoard[i].move(
-                        self.rockIslands[j].x, self.rockIslands[j].y)
-
-        self.drawAllShips(self.allShipsOnBoard)
-
     def run(self):
         running = True
 
@@ -535,7 +532,7 @@ class Game:
                     running = False
 
             self.play()
-            time.sleep(0.25)  # Tutaj najlepiej pasuje 0.2 lub 0.3
+            time.sleep(0.2)  # Tutaj najlepiej pasuje 0.2 lub 0.3
 
 
 if __name__ == "__main__":
@@ -544,5 +541,4 @@ if __name__ == "__main__":
 
 # Każda frakcja będzie miała 3/4 rodzaje statków (w tym 2 wyjątkowe dla siebie - różne od pozostałych). W sumie na planszy niech będzie 30 statków (Po 10 dla każdej frakcji).
 # Jeśli pierwsza litera napotkanej frakcji będzie taka sama jaką ma dana frakcja to statki nie walczą
-# W sumie jest 300 pól. Niech 30 pól to będą wyspy skalne (10%) + 30 pól statki (10%)
 # Endurance i strength jest w granicach <1, 6>
