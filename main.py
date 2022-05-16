@@ -7,11 +7,13 @@ from classes.fractionOne import FractionOne
 from classes.fractionTwo import FractionTwo
 from classes.fractionThree import FractionThree
 from classes.rockIsland import RockIsland
+from classes.startWindow import StartWindow
+
 
 WIDTH = 1500
 HEIGHT = 750
 SIZE = 50
-ISLANDS_AMOUNT = 5  # Musi być > 0
+ISLANDS_AMOUNT = 1
 FRACTION_LIST = ["Pirates", "Poland", "Sparrows",
                  "Avengers", "United", "Soccers", "Assassins", "Titans", "Students", "Aliens"]
 
@@ -230,5 +232,10 @@ class Game:
 
 
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    startWindow = StartWindow()
+    startWindow.run()
+    ISLANDS_AMOUNT = startWindow.islandsAmount
+
+    if ISLANDS_AMOUNT > 0 and ISLANDS_AMOUNT < 16:
+        game = Game()
+        game.run()
