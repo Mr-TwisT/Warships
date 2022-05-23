@@ -8,6 +8,7 @@ from classes.fractionTwo import FractionTwo
 from classes.fractionThree import FractionThree
 from classes.rockIsland import RockIsland
 from classes.startWindow import StartWindow
+from classes.endWindow import EndWindow
 
 
 WIDTH = 1500
@@ -215,6 +216,50 @@ class Game:
                         self.fight(
                             self.allShipsOnBoard[i], self.allShipsOnBoard[j])
 
+    def endSimulation(self):
+        self.winnerFraction = ""
+        fraction1 = 0
+        fraction2 = 0
+        fraction3 = 0
+
+        for i in range(len(self.deadShips)):
+            for j in range(10):
+                if self.deadShips[i] == self.fraction1.allMyShips[j]:
+                    fraction1 += 1
+                if self.deadShips[i] == self.fraction2.allMyShips[j]:
+                    fraction2 += 1
+                if self.deadShips[i] == self.fraction3.allMyShips[j]:
+                    fraction3 += 1
+
+        if self.fraction1.name[0] == self.fraction2.name[0] == self.fraction3.name[0]:
+            self.winnerFraction = "REMIS"
+            return True
+        if fraction1 == 10 and (self.fraction2.name[0] == self.fraction3.name[0]):
+            self.winnerFraction = f"WYGRAŁY FRAKCJE  '{self.fraction2.name}' i '{self.fraction3.name}'"
+            return True
+        if fraction2 == 10 and (self.fraction1.name[0] == self.fraction3.name[0]):
+            self.winnerFraction = f"WYGRAŁY FRAKCJE  '{self.fraction1.name}' i '{self.fraction3.name}'"
+            return True
+        if fraction3 == 10 and (self.fraction1.name[0] == self.fraction2.name[0]):
+            self.winnerFraction = f"WYGRAŁY FRAKCJE  '{self.fraction1.name}' i '{self.fraction2.name}'"
+            return True
+        if (fraction1 == 10 and fraction2 == 10):
+            self.winnerFraction = f"WYGRAŁA FRAKCJA  '{self.fraction3.name}'"
+            return True
+        if (fraction1 == 10 and fraction3 == 10):
+            self.winnerFraction = f"WYGRAŁA FRAKCJA  '{self.fraction2.name}'"
+            return True
+        if (fraction2 == 10 and fraction3 == 10):
+            self.winnerFraction = f"WYGRAŁA FRAKCJA  '{self.fraction1.name}'"
+            return True
+        else:
+            return False
+
+    def endScreen(self):
+        endWindow = EndWindow()
+        endWindow.displayText(self.winnerFraction)
+        endWindow.run()
+
     def run(self):
         running = True
 
@@ -228,6 +273,9 @@ class Game:
                     running = False
 
             self.play()
+            if self.endSimulation():
+                self.endScreen()
+                running = False
             time.sleep(0.2)
 
 
@@ -239,3 +287,5 @@ if __name__ == "__main__":
     if ISLANDS_AMOUNT > 0 and ISLANDS_AMOUNT < 16:
         game = Game()
         game.run()
+
+# Znowu ten błąd!!!
